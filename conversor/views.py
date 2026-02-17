@@ -1,3 +1,4 @@
+from django.http import JsonResponse
 from django.shortcuts import render, get_object_or_404
 from .models import Especialidad, Magnitud, Unidad
 from .utils import CONVERSION_FUNCTIONS
@@ -59,3 +60,15 @@ def convertir_view(request, magnitud_id):
             context['error'] = f"Error en la conversión: {str(e)}"
     
     return render(request, "conversor/convertir.html", context)
+
+
+def debug_magnitud(request, magnitud_id):
+    """Vista temporal para debug"""
+    magnitud = get_object_or_404(Magnitud, id=magnitud_id)
+    unidades = list(magnitud.unidades.values('id', 'nombre', 'simbolo'))
+    
+    return JsonResponse({
+        'magnitud': magnitud.nombre,
+        'total_unidades': magnitud.unidades.count(),
+        'unidades': unidades
+    })
