@@ -12,19 +12,21 @@ def seleccionar_magnitud(request):
 
 def convertir_view(request, magnitud_id):
     magnitud = get_object_or_404(Magnitud.objects.prefetch_related('unidades'), id=magnitud_id)
+    unidades = magnitud.unidades.all()  # ← AGREGAR ESTA LÍNEA
     
     context = {
         'magnitud': magnitud,
+        'unidades': unidades,  # ← AGREGAR ESTA LÍNEA
         'resultado': None,
         'error': None,
         'valor': None,
-        'unidad_origen': None,
-        'unidad_destino': None,
+        'unidad_origen_sel': None,
+        'unidad_destino_sel': None,
         'unidad_origen_id': None,
         'unidad_destino_id': None,
     }
     
-    if request.method == 'POST':  # ← Verifica que sea POST
+    if request.method == 'POST':
         try:
             valor = Decimal(request.POST.get('valor', '0'))
             unidad_origen_id = int(request.POST.get('unidad_origen'))
@@ -46,10 +48,10 @@ def convertir_view(request, magnitud_id):
                 )
                 
                 context.update({
-                    'resultado': resultado,
+                    'resultado': round(resultado, 4),  # ← Redondear a 4 decimales
                     'valor': valor,
-                    'unidad_origen': unidad_origen,
-                    'unidad_destino': unidad_destino,
+                    'unidad_origen_sel': unidad_origen,  # ← Cambiar nombre
+                    'unidad_destino_sel': unidad_destino,  # ← Cambiar nombre
                     'unidad_origen_id': unidad_origen_id,
                     'unidad_destino_id': unidad_destino_id,
                 })
@@ -69,6 +71,7 @@ def debug_magnitud(request, magnitud_id):
     
     return JsonResponse({
         'magnitud': magnitud.nombre,
+        'codigo_calculo': magnitud.codigo_calculo,
         'total_unidades': magnitud.unidades.count(),
         'unidades': unidades
     })

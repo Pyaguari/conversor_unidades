@@ -1,3 +1,4 @@
+<!-- filepath: conversor/templates/conversor/convertir.html -->
 {% extends "conversor/base.html" %}
 
 {% block title %}{{ magnitud.nombre }} · Conversor{% endblock %}
@@ -22,16 +23,27 @@
                 <div class="form-field">
                     <label>
                         <span>Valor</span>
-                        <input class="input" type="number" step="any" name="valor" required>
+                        <input 
+                            class="input" 
+                            type="number" 
+                            step="any" 
+                            name="valor" 
+                            placeholder="Ingresa el valor"
+                            value="{{ valor|default:'' }}"
+                            required
+                        >
                     </label>
                 </div>
 
                 <div class="form-field">
                     <label>
                         <span>Unidad origen</span>
-                        <select class="select" name="unidad_origen">
+                        <select class="select" name="unidad_origen" required>
+                            <option value="">-- Selecciona --</option>
                             {% for u in unidades %}
-                                <option value="{{ u.id }}">{{ u.nombre }} ({{ u.simbolo }})</option>
+                                <option value="{{ u.id }}" {% if unidad_origen_id == u.id %}selected{% endif %}>
+                                    {{ u.nombre }} ({{ u.simbolo }})
+                                </option>
                             {% endfor %}
                         </select>
                     </label>
@@ -40,9 +52,12 @@
                 <div class="form-field">
                     <label>
                         <span>Unidad destino</span>
-                        <select class="select" name="unidad_destino">
+                        <select class="select" name="unidad_destino" required>
+                            <option value="">-- Selecciona --</option>
                             {% for u in unidades %}
-                                <option value="{{ u.id }}">{{ u.nombre }} ({{ u.simbolo }})</option>
+                                <option value="{{ u.id }}" {% if unidad_destino_id == u.id %}selected{% endif %}>
+                                    {{ u.nombre }} ({{ u.simbolo }})
+                                </option>
                             {% endfor %}
                         </select>
                     </label>
@@ -50,12 +65,12 @@
             </div>
 
             <button class="button-primary" type="submit">
-                Convertir
+                ⚡ Convertir
             </button>
 
             {% if error %}
                 <div class="alert-error">
-                    {{ error }}
+                    ⚠️ {{ error }}
                 </div>
             {% endif %}
         </form>
@@ -67,21 +82,25 @@
             <div class="result-main">{{ resultado }}</div>
             <div class="result-sub">
                 {% if unidad_origen_sel and unidad_destino_sel %}
-                    De {{ unidad_origen_sel.nombre }} ({{ unidad_origen_sel.simbolo }})
-                    a {{ unidad_destino_sel.nombre }} ({{ unidad_destino_sel.simbolo }})
+                    {{ valor }} {{ unidad_origen_sel.simbolo }} = 
+                    {{ resultado }} {{ unidad_destino_sel.simbolo }}
+                    <br>
+                    <small style="opacity: 0.7;">
+                        De {{ unidad_origen_sel.nombre }} a {{ unidad_destino_sel.nombre }}
+                    </small>
                 {% else %}
                     Conversión realizada.
                 {% endif %}
             </div>
         {% else %}
             <p class="result-sub">
-                Ingresa un valor y pulsa <strong>Convertir</strong> para ver el resultado aquí.
+                Ingresa un valor y selecciona las unidades para comenzar la conversión.
             </p>
         {% endif %}
     </aside>
 </main>
 
 <a class="back-link" href="{% url 'conversor:seleccionar_magnitud' %}">
-    ← Volver a especialidades
+    ← Volver a magnitudes
 </a>
 {% endblock %}
